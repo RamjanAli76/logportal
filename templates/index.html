@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intellize IT | Service Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Pudhu button-kaga chinna style update */
+        .btn-drive {
+            background-color: #28a745; /* Green color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: bold;
+        }
+        .btn-drive:hover { background-color: #218838; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-pdf { background-color: #dc3545; color: white; flex: 1; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-excel { background-color: #007bff; color: white; flex: 1; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo">
+            <h2>Service Report Portal</h2>
+        </div>
+        <form action="/generate" method="POST">
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" name="company" placeholder="Client Company Name" required>
+            </div>
+            <div class="grid-row">
+                <div class="form-group"><label>Date</label><input type="date" name="date" id="reportDate" required></div>
+                <div class="form-group"><label>Visit Type</label>
+                    <select name="visit_type"><option>Direct Visit</option><option>Online Visit</option></select>
+                </div>
+            </div>
+            <div class="form-group"><label>Works Carried Out</label><textarea name="works" required></textarea></div>
+            <div class="form-group"><label>Workers Name</label><textarea name="workers" style="height: 60px;" required></textarea></div>
+            <div class="grid-row">
+                <div class="form-group"><label>In Time</label>
+                    <div class="time-input"><input type="text" name="in_time" placeholder="09:00" required>
+                    <select name="in_period"><option>AM</option><option>PM</option></select></div>
+                </div>
+                <div class="form-group"><label>Out Time</label>
+                    <div class="time-input"><input type="text" name="out_time" placeholder="06:00" required>
+                    <select name="out_period"><option>AM</option><option>PM</option></select></div>
+                </div>
+            </div>
+            <div class="form-group"><label>Client Staff Name</label><input type="text" name="staff_name" placeholder="Staff Name" required></div>
+            
+            <input type="hidden" name="format" id="formatType" value="pdf">
+
+            <div class="btn-group">
+                <button type="submit" class="btn-pdf" onclick="document.getElementById('formatType').value='pdf'">
+                    Download PDF
+                </button>
+                
+                <button type="submit" class="btn-excel" onclick="document.getElementById('formatType').value='excel'">
+                    Download Excel
+                </button>
+
+                <button type="submit" class="btn-drive" onclick="document.getElementById('formatType').value='drive_excel'">
+                    Save to Drive
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>document.getElementById('reportDate').valueAsDate = new Date();</script>
+</body>
+</html>

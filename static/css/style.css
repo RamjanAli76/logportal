@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Intellize Brand Gradient (Pink to Yellow) */
+    --brand-gradient: linear-gradient(135deg, #FF3366 0%, #FFBB00 100%);
+    --glass-white: rgba(255, 255, 255, 0.2);
+    --input-bg: rgba(255, 255, 255, 0.85);
+    --text-dark: #1e293b;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    /* Background fully represents the brand colors */
+    background: var(--brand-gradient);
+    background-attachment: fixed;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Glassy Transparent UI Container */
+.container {
+    background: var(--glass-white);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    width: 100%;
+    max-width: 750px;
+    padding: 40px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.header img {
+    height: 60px;
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: white;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Form Layout Logic */
+.form-group {
+    margin-bottom: 22px;
+}
+
+label {
+    display: block;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    margin-left: 5px;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 14px;
+    font-size: 15px;
+    background: var(--input-bg);
+    color: var(--text-dark);
+    box-sizing: border-box;
+    transition: var(--transition);
+}
+
+textarea {
+    height: 90px;
+    resize: none;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+/* --- FIXED AM/PM ALIGNMENT LOGIC --- */
+.time-container {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between input and select */
+    width: 100%;
+}
+
+.time-container input {
+    flex: 3; /* Occupies more space */
+}
+
+.time-container select {
+    flex: 1.2; /* Properly sized for AM/PM */
+    min-width: 85px;
+    padding: 14px 10px;
+    cursor: pointer;
+    background-image: none; /* Removes default arrows if needed */
+}
+
+/* Button UI */
+.btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+button {
+    padding: 16px;
+    border: none;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: var(--transition);
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+.btn-pdf { background: #E11D48; }
+.btn-excel { background: #2563EB; }
+.btn-drive { background: #10B981; }
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Responsive Alignment */
+@media (max-width: 650px) {
+    .grid-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .btn-group {
+        grid-template-columns: 1fr;
+    }
+    .container {
+        padding: 30px 20px;
+        border-radius: 0; /* Full width for mobile */
+    }
+    .time-container select {
+        min-width: 75px;
+    }
+}
