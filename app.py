@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import os
 import requests
 import base64
@@ -14,7 +14,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGO_PATH = os.path.join(BASE_DIR, 'static', 'logo.jpg')
 
-# Google Script URL
+# Unga Google Script Web App URL-ai inga podunga
 GAS_URL = "https://script.google.com/macros/s/AKfycbzsZwon1BuwdSLgjJhx5gU6x5wvMHaXMEh9NTvRGyj6Eyy1h1ws1lpSYW9eU3BOpFdS/exec"
 
 @app.route('/')
@@ -25,9 +25,8 @@ def index():
 def generate():
     try:
         company = request.form.get('company', 'Service_Report').strip()
-        raw_date = request.form.get('date', '') # Inga YYYY-MM-DD-nu varum
+        raw_date = request.form.get('date', '')
         
-        # Date Format-ai DD-MM-YYYY-ku mathuroam
         if raw_date:
             date_obj = datetime.strptime(raw_date, '%Y-%m-%d')
             date_val = date_obj.strftime('%d-%m-%Y')
@@ -43,39 +42,45 @@ def generate():
             'workers': request.form.get('workers'), 'in_time': in_time,
             'out_time': out_time, 'visit': request.form.get('visit_type'),
             'staff': request.form.get('staff_name'),
-            'raw_date': raw_date # Month folder create panna script-ku raw date venum
+            'raw_date': raw_date
         }
 
         clean_name = company.replace(" ", "_")
+        filename_pdf = f"{clean_name}_service_{date_val}.pdf"
         
-        if action_format == 'drive_excel':
-            filename = f"{clean_name}_service_{date_val}.pdf"
-            path = generate_pdf(data)
-            mimetype = 'application/pdf'
-            
-            with open(path, "rb") as f:
+        # --- AUTO SAVE LOGIC START ---
+        # User entha button-ai amukunaalum, background-la PDF generate panni Drive-ku anupum
+        temp_pdf_path = generate_pdf(data)
+        
+        try:
+            with open(temp_pdf_path, "rb") as f:
                 encoded_string = base64.b64encode(f.read()).decode('utf-8')
                 requests.post(GAS_URL, data={
                     'fileData': encoded_string,
-                    'filename': filename,
+                    'filename': filename_pdf,
                     'company': company,
-                    'date': raw_date, # Script-ku YYYY-MM-DD dhaan correct-aa month kandupidikka udhavum
-                    'mimeType': mimetype
-                })
-            return f"Success: Log Sheet saved under {company} folder!"
+                    'date': raw_date,
+                    'mimeType': 'application/pdf'
+                }, timeout=5) # 5 seconds-la backend-la upload aagidum
+        except Exception as drive_err:
+            print(f"Drive Auto-save Error: {drive_err}")
+        # --- AUTO SAVE LOGIC END ---
 
-        elif action_format == 'excel':
-            filename = f"{clean_name}_service_{date_val}.xlsx"
-            path = generate_excel(data)
-            return send_file(path, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name=filename)
+        if action_format == 'excel':
+            filename_excel = f"{clean_name}_service_{date_val}.xlsx"
+            excel_path = generate_excel(data)
+            return send_file(excel_path, as_attachment=True, download_name=filename_excel)
+        
+        elif action_format == 'drive_excel':
+            # Animation-kaga JSON response
+            return jsonify({"status": "success", "message": f"Log Sheet Auto-saved in Drive & {company} folder!"})
 
         else:
-            filename = f"{clean_name}_service_{date_val}.pdf"
-            path = generate_pdf(data)
-            return send_file(path, as_attachment=True, download_name=filename)
+            # Direct PDF download
+            return send_file(temp_pdf_path, as_attachment=True, download_name=filename_pdf)
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return jsonify({"status": "error", "message": str(e)})
 
 def generate_excel(data):
     path = os.path.join(BASE_DIR, "temp_report.xlsx")
@@ -118,7 +123,7 @@ def generate_pdf(data):
     table_data = [
         ["Date", "Company Name", "Works Carried Out", "Workers", "Time In/Out", "Visit", "Staff Name", "Signature"],
         [
-            data['date'], # Ippo DD-MM-YYYY format-la irukkum
+            data['date'],
             Paragraph(data['company'], style_n), 
             Paragraph(data['works'].replace('\n', '<br/>'), style_n), 
             Paragraph(data['workers'].replace('\n', '<br/>'), style_n),
